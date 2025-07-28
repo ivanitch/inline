@@ -16,3 +16,20 @@ git clone git@github.com:ivanitch/inline.git .
 ```bash
 make build && make up && make app
 ```
+
+## Создать таблицы в БД
+Выполнить SQL запрос из файла:
+```bash
+migrations/init.sql
+```
+
+## Создать таблицы в БД
+
+
+
+
+
+
+
+
+
