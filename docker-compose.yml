@@ -1,0 +1,56 @@
+services:
+
+  nginx:
+    container_name: ${APP_NAME}_nginx
+    image: nginx:${NGINX_VERSION}
+    ports:
+      - 80:80
+    volumes:
+      - ./.docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - ./.docker/log/nginx:/var/log/nginx
+      - .:/var/www/html
+    depends_on:
+      - php-fpm
+      - database
+    networks:
+      - app-network
+
+  php-fpm:
+    container_name: ${APP_NAME}_php-fpm
+    ports:
+      - 9000:9000
+    build:
+      context: ./.docker/php-fpm
+      args:
+        PHP_FPM_VERSION: ${PHP_FPM_VERSION}
+    volumes:
+      - ./.docker/php-fpm/conf.d/php.ini:/usr/local/etc/php/conf.d/custom.ini
+      - .:/var/www/html
+    depends_on:
+      - database
+    networks:
+      - app-network
+
+  database:
+    container_name: ${APP_NAME}_database
+    image: mysql:${MYSQL_VERSION}
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - ./.docker/mysql/data/db/mysql:/var/lib/mysql
+      - ./.docker/mysql/conf.d/my.conf:/etc/mysql/conf.d/my.cnf
+      - .:/var/www/html
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
