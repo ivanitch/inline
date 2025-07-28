@@ -82,6 +82,34 @@ readonly class Query
         }
     }
 
+    /**
+     * @param string $search
+     *
+     * @return array
+     */
+    public function searchPostsByCommentText(string $search): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT
+                p.id AS post_id,
+                p.title AS post_title,
+                c.id AS comment_id,
+                c.body AS comment_body
+            FROM
+                posts p
+            JOIN
+                comments c ON p.id = c.post_id
+            WHERE
+                c.body LIKE :search
+            ORDER BY
+                p.id, c.id
+        ");
+
+        $stmt->execute([':search' => '%' . $search . '%']);
+
+        return $stmt->fetchAll();
+    }
+
     private function getConnection(): PDO
     {
         return $this->pdo;

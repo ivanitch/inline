@@ -9,15 +9,16 @@ use Inline\Query;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-$dbConfig = require_once dirname(__DIR__) . '/config/db.php';
-
 echo "Начинается загрузка данных из API в базу данных...\n";
 
 $postsCount    = 0;
 $commentsCount = 0;
 
 try {
-    $pdo = Connection::getInstance($dbConfig);
+    $pdo = Connection::getInstance(
+        require_once dirname(__DIR__) . '/config/db.php'
+    );
+
     echo "Успешное подключение к базе данных.\n";
 
     $queryService = new Query($pdo);
@@ -80,8 +81,8 @@ try {
 } catch (Exception $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
-        echo "Транзакция отменена из-за непредвиденной ошибки.\n";
+        echo "Транзакция отменена из-за ошибки.\n";
     }
-    echo "Произошла непредвиденная ошибка: " . $e->getMessage() . "\n";
+    echo "Произошла ошибка: " . $e->getMessage() . "\n";
     exit(1);
 }
